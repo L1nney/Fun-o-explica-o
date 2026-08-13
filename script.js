@@ -1,117 +1,248 @@
-let currentStep = 0;
-const totalSteps = 6;
-let chartInstance = null;
-
-function updateStep() {
-  for (let i = 1; i <= totalSteps; i++) {
-    const node = document.getElementById(`node-${i}`);
-    const line = document.getElementById(`line-${i}`);
-
-    if (i <= currentStep) {
-      node.classList.add('visible');
-      if (line) line.classList.add('active');
-    } else {
-      node.classList.remove('visible');
-      if (line) line.classList.remove('active');
-    }
-
-    if (i === currentStep) {
-      node.classList.add('active-highlight');
-    } else {
-      node.classList.remove('active-highlight');
-    }
-  }
-
-  // Quando chegar no passo 6, renderiza o gráfico
-  if (currentStep === 6 && !chartInstance) {
-    renderGraph();
-  }
+/* Estilos Gerais e Tema Dark */
+:root {
+  --bg-color: #0d1117;
+  --card-bg: #161b22;
+  --card-border: #30363d;
+  --text-main: #c9d1d9;
+  --accent-purple: #8a2be2;
+  --accent-blue: #58a6ff;
+  --accent-green: #3fb950;
+  --accent-orange: #d29922;
+  --accent-pink: #f778ba;
 }
 
-function nextStep() {
-  if (currentStep < totalSteps) {
-    currentStep++;
-  } else {
-    currentStep = 0; // Reinicia o mapa
-  }
-  updateStep();
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-function prevStep() {
-  if (currentStep > 0) {
-    currentStep--;
-    updateStep();
-  }
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow-x: hidden;
 }
 
-// Navegação por teclado (Espaço, Enter, Setas)
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' || e.code === 'ArrowRight' || e.code === 'Enter') {
-    e.preventDefault();
-    nextStep();
-  } else if (e.code === 'ArrowLeft' || e.code === 'Backspace') {
-    e.preventDefault();
-    prevStep();
-  }
-});
+/* Header */
+header {
+  width: 100%;
+  max-width: 1250px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
 
-// Função para desenhar o gráfico da parábola f(x) = x² - 4x + 3
-function renderGraph() {
-  const ctx = document.getElementById('parabolaChart').getContext('2d');
+.title-tag {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
-  // Gerar pontos de x de -1 até 5
-  const xValues = [];
-  const yValues = [];
-  for (let x = -0.5; x <= 4.5; x += 0.2) {
-    xValues.push(x.toFixed(1));
-    yValues.push((x * x) - (4 * x) + 3);
-  }
+.controls-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #8b949e;
+}
 
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: xValues,
-      datasets: [
-        {
-          label: 'f(x) = x² - 4x + 3',
-          data: yValues,
-          borderColor: '#8a2be2',
-          borderWidth: 3,
-          fill: false,
-          tension: 0.4,
-          pointRadius: 0
-        },
-        {
-          label: 'Pontos Notáveis',
-          data: [
-            { x: '0.0', y: 3 },  // Eixo Y
-            { x: '1.0', y: 0 },  // Raiz 1
-            { x: '2.0', y: -1 }, // Vértice
-            { x: '3.0', y: 0 }   // Raiz 2
-          ],
-          backgroundColor: '#3fb950',
-          borderColor: '#ffffff',
-          pointRadius: 6,
-          showLine: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: {
-          grid: { color: '#30363d' },
-          ticks: { color: '#8b949e', font: { size: 9 } }
-        },
-        y: {
-          grid: { color: '#30363d' },
-          ticks: { color: '#8b949e', font: { size: 9 } }
-        }
-      }
-    }
-  });
+kbd {
+  background-color: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 4px 8px;
+}
+
+.btn-next {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn-next:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}
+
+/* Tabuleiro do Mapa Mental */
+.mindmap-container {
+  position: relative;
+  width: 100%;
+  max-width: 1250px;
+  min-height: 740px;
+  background: rgba(22, 27, 34, 0.5);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* Linhas Conectoras em SVG */
+svg.lines-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+line {
+  stroke: var(--card-border);
+  stroke-width: 3;
+  stroke-dasharray: 8;
+  transition: stroke 0.5s, stroke-dashoffset 0.5s;
+}
+
+line.active {
+  stroke: var(--accent-blue);
+  animation: dash 1.5s linear infinite;
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: -16; }
+}
+
+/* Estilo dos Cards (Nós) */
+.node {
+  position: absolute;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.7) translateY(20px);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  width: 330px;
+}
+
+.node.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.node.active-highlight {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+}
+
+/* Card Central */
+.node-center {
+  top: 28%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  text-align: center;
+  background: linear-gradient(145deg, #1f242d, #161b22);
+  border-color: var(--accent-purple);
+  width: 340px;
+}
+
+.node-center.visible {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.node-center h1 {
+  font-size: 1.6rem;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.node-center .formula {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--accent-pink);
+  background: rgba(247, 120, 186, 0.1);
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* Posições Radiais dos Cards */
+.pos-top-left { top: 4%; left: 3%; }
+.pos-top-right { top: 4%; right: 3%; }
+.pos-mid-right { top: 42%; right: 2%; }
+.pos-bottom-right { bottom: 4%; right: 6%; }
+.pos-bottom-left { bottom: 4%; left: 6%; }
+.pos-mid-left { top: 42%; left: 2%; }
+
+.node h3 {
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+  color: var(--accent-blue);
+}
+
+.node p {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: #8b949e;
+}
+
+.math-badge {
+  display: block;
+  margin-top: 8px;
+  padding: 8px;
+  background: #0d1117;
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  color: #e6edf3;
+  font-size: 0.88rem;
+}
+
+/* Caixa de Explicação Didática ("O que é") */
+.explanation-box {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(88, 166, 255, 0.08);
+  border: 1px dashed rgba(88, 166, 255, 0.3);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: #c9d1d9;
+  line-height: 1.35;
+}
+
+.explanation-box strong {
+  color: var(--accent-green);
+}
+
+/* Canvas do Gráfico - slightly larger area */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  margin-top: 6px;
+}
+
+footer {
+  margin-top: 15px;
+  font-size: 0.85rem;
+  color: #484f58;
 }
