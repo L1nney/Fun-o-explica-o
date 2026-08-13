@@ -22,8 +22,9 @@ function updateStep() {
     }
   }
 
+  // Quando chega na etapa 6, desenha o gráfico cartesiano perfeito
   if (currentStep === 6 && !graphDrawn) {
-    drawExactGraph();
+    drawExactCartesianGraph();
     graphDrawn = true;
   }
 }
@@ -44,6 +45,7 @@ function prevStep() {
   }
 }
 
+// Navegação por teclado
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowRight' || e.code === 'Enter') {
     e.preventDefault();
@@ -54,63 +56,63 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-function drawExactGraph() {
+// Desenha o Plano Cartesiano Exato com Eixos X e Y
+function drawExactCartesianGraph() {
   const canvas = document.getElementById('parabolaChart');
   const ctx = canvas.getContext('2d');
 
-  canvas.width = canvas.parentElement.clientWidth || 300;
-  canvas.height = canvas.parentElement.clientHeight || 220;
+  canvas.width = canvas.parentElement.clientWidth || 320;
+  canvas.height = canvas.parentElement.clientHeight || 260;
 
   const w = canvas.width;
   const h = canvas.height;
 
-  // Definindo a origem (0,0) cartesiana
-  const originX = w * 0.28; 
-  const originY = h * 0.70;
-  const scaleX = w / 5.5;
-  const scaleY = h / 6.5;
+  // Posição central da Origem (0,0) no gráfico
+  const originX = w * 0.30; 
+  const originY = h * 0.68;
+  const scaleX = w / 6;  // Escala em pixels por unidade
+  const scaleY = h / 7;
 
   ctx.clearRect(0, 0, w, h);
 
-  // 1. EIXO X (Linha Horizontal principal)
+  // 1. EIXO X (LINHA HORIZONTAL PRINCIPAL)
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(15, originY);
-  ctx.lineTo(w - 15, originY);
+  ctx.moveTo(10, originY);
+  ctx.lineTo(w - 10, originY);
   ctx.stroke();
 
-  // Seta X
+  // Seta do Eixo X
   ctx.beginPath();
-  ctx.moveTo(w - 15, originY - 4);
-  ctx.lineTo(w - 5, originY);
-  ctx.lineTo(w - 15, originY + 4);
+  ctx.moveTo(w - 10, originY - 4);
+  ctx.lineTo(w - 2, originY);
+  ctx.lineTo(w - 10, originY + 4);
   ctx.fillStyle = '#ffffff';
   ctx.fill();
 
-  // 2. EIXO Y (Linha Vertical principal)
+  // 2. EIXO Y (LINHA VERTICAL PRINCIPAL)
   ctx.beginPath();
   ctx.moveTo(originX, h - 10);
   ctx.lineTo(originX, 10);
   ctx.stroke();
 
-  // Seta Y
+  // Seta do Eixo Y
   ctx.beginPath();
   ctx.moveTo(originX - 4, 10);
   ctx.lineTo(originX, 2);
   ctx.lineTo(originX + 4, 10);
   ctx.fill();
 
-  // Rótulo dos Eixos
+  // Nomes dos Eixos
   ctx.font = 'bold 12px sans-serif';
   ctx.fillStyle = '#58a6ff';
   ctx.fillText('X', w - 12, originY + 16);
   ctx.fillText('Y', originX - 16, 12);
 
-  // Números nos eixos
+  // Marcações e Números do Eixo X (1, 2, 3, 4)
   ctx.font = '10px sans-serif';
   ctx.fillStyle = '#8b949e';
-  
   [1, 2, 3, 4].forEach(xVal => {
     let px = originX + xVal * scaleX;
     ctx.beginPath();
@@ -121,6 +123,7 @@ function drawExactGraph() {
     ctx.fillText(xVal, px - 3, originY + 15);
   });
 
+  // Marcações e Números do Eixo Y (-1, 1, 2, 3)
   [-1, 1, 2, 3].forEach(yVal => {
     let py = originY - yVal * scaleY;
     ctx.beginPath();
@@ -131,7 +134,7 @@ function drawExactGraph() {
     ctx.fillText(yVal, originX - 16, py + 4);
   });
 
-  // 3. PARÁBOLA f(x) = x² - 4x + 3
+  // 3. DESENHO DA PARÁBOLA f(x) = x² - 4x + 3
   ctx.beginPath();
   ctx.strokeStyle = '#a855f7';
   ctx.lineWidth = 3;
@@ -151,7 +154,7 @@ function drawExactGraph() {
   }
   ctx.stroke();
 
-  // 4. LINHAS PONTIAGUDAS PARA O VÉRTICE (2, -1)
+  // 4. LINHAS PONTIAGUDAS CONECTANDO O VÉRTICE (Xv=2 e Yv=-1)
   let vx = originX + 2 * scaleX;
   let vy = originY - (-1) * scaleY;
   
@@ -159,23 +162,25 @@ function drawExactGraph() {
   ctx.strokeStyle = '#58a6ff';
   ctx.lineWidth = 1;
   
+  // Linha vertical ligando x=2 ao vértice
   ctx.beginPath();
   ctx.moveTo(vx, originY);
   ctx.lineTo(vx, vy);
   ctx.stroke();
 
+  // Linha horizontal ligando y=-1 ao vértice
   ctx.beginPath();
   ctx.moveTo(originX, vy);
   ctx.lineTo(vx, vy);
   ctx.stroke();
 
-  ctx.setLineDash([]);
+  ctx.setLineDash([]); // Volta à linha normal
 
-  // 5. PONTOS NOTÁVEIS (EXATOS NO LUGAR CERTO)
+  // 5. PONTOS DE DESTAQUE (EM CIMA DOS EIXOS)
   const keyPoints = [
-    { x: 0, y: 3, label: 'Corte Y (0, 3)', align: 'left' },
-    { x: 1, y: 0, label: 'Raiz (1, 0)', align: 'top' },
-    { x: 3, y: 0, label: 'Raiz (3, 0)', align: 'top' },
+    { x: 0, y: 3, label: 'Intercepto Y (0, 3)', align: 'left' },
+    { x: 1, y: 0, label: 'Raiz x₁ (1, 0)', align: 'top' },
+    { x: 3, y: 0, label: 'Raiz x₂ (3, 0)', align: 'top' },
     { x: 2, y: -1, label: 'Vértice (2, -1)', align: 'bottom' }
   ];
 
@@ -183,6 +188,7 @@ function drawExactGraph() {
     let px = originX + pt.x * scaleX;
     let py = originY - pt.y * scaleY;
 
+    // Bolinha verde no ponto exato
     ctx.beginPath();
     ctx.arc(px, py, 5, 0, Math.PI * 2);
     ctx.fillStyle = '#3fb950';
@@ -191,10 +197,11 @@ function drawExactGraph() {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
+    // Rótulo do Ponto
     ctx.font = 'bold 10px sans-serif';
     ctx.fillStyle = '#3fb950';
     if (pt.align === 'left') ctx.fillText(pt.label, px + 8, py + 3);
-    if (pt.align === 'top') ctx.fillText(pt.label, px - 20, py - 8);
-    if (pt.align === 'bottom') ctx.fillText(pt.label, px - 30, py + 16);
+    if (pt.align === 'top') ctx.fillText(pt.label, px - 25, py - 8);
+    if (pt.align === 'bottom') ctx.fillText(pt.label, px - 35, py + 16);
   });
 }
