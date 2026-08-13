@@ -22,9 +22,8 @@ function updateStep() {
     }
   }
 
-  // Quando chegar no passo 6, desenha o gráfico cartesiano nativo
   if (currentStep === 6 && !graphDrawn) {
-    drawCartesianGraph();
+    drawExactGraph();
     graphDrawn = true;
   }
 }
@@ -33,7 +32,7 @@ function nextStep() {
   if (currentStep < totalSteps) {
     currentStep++;
   } else {
-    currentStep = 0; // Reinicia o mapa
+    currentStep = 0;
   }
   updateStep();
 }
@@ -45,7 +44,6 @@ function prevStep() {
   }
 }
 
-// Navegação por teclado (Espaço, Enter, Setas)
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowRight' || e.code === 'Enter') {
     e.preventDefault();
@@ -56,129 +54,135 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Desenha o gráfico cartesiano completo no estilo quadro/caderno
-function drawCartesianGraph() {
+function drawExactGraph() {
   const canvas = document.getElementById('parabolaChart');
   const ctx = canvas.getContext('2d');
 
-  // Ajustar resolução interna do canvas
-  canvas.width = canvas.parentElement.clientWidth;
-  canvas.height = canvas.parentElement.clientHeight;
+  canvas.width = canvas.parentElement.clientWidth || 300;
+  canvas.height = canvas.parentElement.clientHeight || 220;
 
-  const width = canvas.width;
-  const height = canvas.height;
+  const w = canvas.width;
+  const h = canvas.height;
 
-  // Centro do plano cartesiano (Origem 0,0 na tela)
-  const originX = width * 0.35;
-  const originY = height * 0.65;
-  const scale = 32; // Pixels por unidade matemática
+  // Definindo a origem (0,0) cartesiana
+  const originX = w * 0.28; 
+  const originY = h * 0.70;
+  const scaleX = w / 5.5;
+  const scaleY = h / 6.5;
 
-  // Limpar tela
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, w, h);
 
-  // 1. DESENHAR LINHAS DA GRADE (GRID SUAVE)
-  ctx.strokeStyle = '#21262d';
-  ctx.lineWidth = 1;
-  for (let x = -5; x <= 8; x++) {
-    let px = originX + x * scale;
-    ctx.beginPath();
-    ctx.moveTo(px, 0);
-    ctx.lineTo(px, height);
-    ctx.stroke();
-  }
-  for (let y = -4; y <= 6; y++) {
-    let py = originY - y * scale;
-    ctx.beginPath();
-    ctx.moveTo(0, py);
-    ctx.lineTo(width, py);
-    ctx.stroke();
-  }
-
-  // 2. DESENHAR EIXO X e EIXO Y PRINCIPAIS (DESTACADOS)
-  ctx.strokeStyle = '#c9d1d9';
+  // 1. EIXO X (Linha Horizontal principal)
+  ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 2;
-
-  // Eixo X (Linha Horizontal)
   ctx.beginPath();
-  ctx.moveTo(10, originY);
-  ctx.lineTo(width - 10, originY);
+  ctx.moveTo(15, originY);
+  ctx.lineTo(w - 15, originY);
   ctx.stroke();
 
-  // Seta do Eixo X
+  // Seta X
   ctx.beginPath();
-  ctx.moveTo(width - 10, originY - 5);
-  ctx.lineTo(width - 2, originY);
-  ctx.lineTo(width - 10, originY + 5);
-  ctx.fillStyle = '#c9d1d9';
+  ctx.moveTo(w - 15, originY - 4);
+  ctx.lineTo(w - 5, originY);
+  ctx.lineTo(w - 15, originY + 4);
+  ctx.fillStyle = '#ffffff';
   ctx.fill();
 
-  // Eixo Y (Linha Vertical)
+  // 2. EIXO Y (Linha Vertical principal)
   ctx.beginPath();
-  ctx.moveTo(originX, height - 10);
+  ctx.moveTo(originX, h - 10);
   ctx.lineTo(originX, 10);
   ctx.stroke();
 
-  // Seta do Eixo Y
+  // Seta Y
   ctx.beginPath();
-  ctx.moveTo(originX - 5, 10);
+  ctx.moveTo(originX - 4, 10);
   ctx.lineTo(originX, 2);
-  ctx.lineTo(originX + 5, 10);
+  ctx.lineTo(originX + 4, 10);
   ctx.fill();
 
-  // Rótulos dos Eixos X e Y
+  // Rótulo dos Eixos
   ctx.font = 'bold 12px sans-serif';
-  ctx.fillText('X', width - 18, originY + 18);
-  ctx.fillText('Y', originX - 18, 15);
+  ctx.fillStyle = '#58a6ff';
+  ctx.fillText('X', w - 12, originY + 16);
+  ctx.fillText('Y', originX - 16, 12);
 
-  // Marcações numéricas nos eixos
+  // Números nos eixos
   ctx.font = '10px sans-serif';
   ctx.fillStyle = '#8b949e';
-  for (let x = -2; x <= 5; x++) {
-    if (x !== 0) {
-      let px = originX + x * scale;
-      ctx.fillText(x, px - 3, originY + 14);
-    }
-  }
-  for (let y = -2; y <= 4; y++) {
-    if (y !== 0) {
-      let py = originY - y * scale;
-      ctx.fillText(y, originX - 15, py + 4);
-    }
-  }
+  
+  [1, 2, 3, 4].forEach(xVal => {
+    let px = originX + xVal * scaleX;
+    ctx.beginPath();
+    ctx.moveTo(px, originY - 3);
+    ctx.lineTo(px, originY + 3);
+    ctx.strokeStyle = '#8b949e';
+    ctx.stroke();
+    ctx.fillText(xVal, px - 3, originY + 15);
+  });
 
-  // 3. DESENHAR A PARÁBOLA f(x) = x² - 4x + 3
+  [-1, 1, 2, 3].forEach(yVal => {
+    let py = originY - yVal * scaleY;
+    ctx.beginPath();
+    ctx.moveTo(originX - 3, py);
+    ctx.lineTo(originX + 3, py);
+    ctx.strokeStyle = '#8b949e';
+    ctx.stroke();
+    ctx.fillText(yVal, originX - 16, py + 4);
+  });
+
+  // 3. PARÁBOLA f(x) = x² - 4x + 3
   ctx.beginPath();
   ctx.strokeStyle = '#a855f7';
   ctx.lineWidth = 3;
 
-  let firstPoint = true;
-  for (let x = -1.2; x <= 5.2; x += 0.05) {
+  let first = true;
+  for (let x = -0.5; x <= 4.5; x += 0.02) {
     let y = (x * x) - (4 * x) + 3;
-    let px = originX + x * scale;
-    let py = originY - y * scale;
+    let px = originX + x * scaleX;
+    let py = originY - y * scaleY;
 
-    if (firstPoint) {
+    if (first) {
       ctx.moveTo(px, py);
-      firstPoint = false;
+      first = false;
     } else {
       ctx.lineTo(px, py);
     }
   }
   ctx.stroke();
 
-  // 4. DESENHAR PONTOS NOTÁVEIS E SUAS ETIQUETAS
-  const points = [
-    { x: 0, y: 3, label: '(0,3) Y', align: 'right' },
-    { x: 1, y: 0, label: 'x₁=(1,0)', align: 'top' },
-    { x: 3, y: 0, label: 'x₂=(3,0)', align: 'top' },
-    { x: 2, y: -1, label: 'V(2,-1)', align: 'bottom' }
+  // 4. LINHAS PONTIAGUDAS PARA O VÉRTICE (2, -1)
+  let vx = originX + 2 * scaleX;
+  let vy = originY - (-1) * scaleY;
+  
+  ctx.setLineDash([3, 3]);
+  ctx.strokeStyle = '#58a6ff';
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.moveTo(vx, originY);
+  ctx.lineTo(vx, vy);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(originX, vy);
+  ctx.lineTo(vx, vy);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+
+  // 5. PONTOS NOTÁVEIS (EXATOS NO LUGAR CERTO)
+  const keyPoints = [
+    { x: 0, y: 3, label: 'Corte Y (0, 3)', align: 'left' },
+    { x: 1, y: 0, label: 'Raiz (1, 0)', align: 'top' },
+    { x: 3, y: 0, label: 'Raiz (3, 0)', align: 'top' },
+    { x: 2, y: -1, label: 'Vértice (2, -1)', align: 'bottom' }
   ];
 
-  points.forEach(pt => {
-    let px = originX + pt.x * scale;
-    let py = originY - pt.y * scale;
+  keyPoints.forEach(pt => {
+    let px = originX + pt.x * scaleX;
+    let py = originY - pt.y * scaleY;
 
-    // Bolinha do Ponto
     ctx.beginPath();
     ctx.arc(px, py, 5, 0, Math.PI * 2);
     ctx.fillStyle = '#3fb950';
@@ -187,11 +191,10 @@ function drawCartesianGraph() {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Texto do Ponto
-    ctx.font = 'bold 11px sans-serif';
-    ctx.fillStyle = '#58a6ff';
-    if (pt.align === 'right') ctx.fillText(pt.label, px + 8, py + 4);
-    if (pt.align === 'top') ctx.fillText(pt.label, px - 18, py - 8);
-    if (pt.align === 'bottom') ctx.fillText(pt.label, px - 18, py + 18);
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillStyle = '#3fb950';
+    if (pt.align === 'left') ctx.fillText(pt.label, px + 8, py + 3);
+    if (pt.align === 'top') ctx.fillText(pt.label, px - 20, py - 8);
+    if (pt.align === 'bottom') ctx.fillText(pt.label, px - 30, py + 16);
   });
 }
