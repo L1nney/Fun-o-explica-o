@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Função Quadrática - Apresentação Interativa</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js para renderizar o gráfico -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <header>
+    <div class="title-tag">Matemática Interativa</div>
+    <div class="controls-hint">
+      <span>Aperte <kbd>Espaço</kbd>, <kbd>→</kbd> ou clique em</span>
+      <button class="btn-next" onclick="nextStep()">Próximo Passo ➔</button>
+    </div>
+  </header>
+
+  <div class="mindmap-container">
+    <!-- Camada SVG de Conexões -->
+    <svg class="lines-layer" id="svg-lines">
+      <line id="line-1" x1="50%" y1="28%" x2="20%" y2="20%" />
+      <line id="line-2" x1="50%" y1="28%" x2="80%" y2="20%" />
+      <line id="line-3" x1="50%" y1="28%" x2="82%" y2="52%" />
+      <line id="line-4" x1="50%" y1="28%" x2="75%" y2="82%" />
+      <line id="line-5" x1="50%" y1="28%" x2="25%" y2="82%" />
+      <line id="line-6" x1="50%" y1="28%" x2="18%" y2="52%" />
+    </svg>
+
+    <!-- Centro (Passo 0) -->
+    <div class="node node-center visible" id="node-0">
+      <h1>Função Específica</h1>
+      <p>Estudo completo da função:</p>
+      <div class="formula">f(x) = x² - 4x + 3</div>
+    </div>
+
+    <!-- Passo 1: Coeficientes -->
+    <div class="node pos-top-left node-1" id="node-1">
+      <h3>📌 1. Coeficientes</h3>
+      <p>Identificando <strong>a</strong>, <strong>b</strong> e <strong>c</strong>:</p>
+      <div class="math-badge">
+        • <strong>a = 1</strong> (curvatura)<br>
+        • <strong>b = -4</strong> (inclinação)<br>
+        • <strong>c = 3</strong> (interseção Y)
+      </div>
+      <div class="explanation-box">
+        <strong>O que é:</strong> Como <i>a = 1 > 0</i>, a parábola tem concavidade voltada para <strong>cima</strong> (formato de sorriso).
+      </div>
+    </div>
+
+    <!-- Passo 2: Corte no Eixo Y -->
+    <div class="node pos-top-right node-2" id="node-2">
+      <h3>📍 2. Ponto no Eixo Y</h3>
+      <p>Onde a curva cruza o eixo vertical (x = 0):</p>
+      <div class="math-badge">
+        f(0) = (0)² - 4(0) + 3<br>
+        <strong>Ponto: (0, 3)</strong>
+      </div>
+      <div class="explanation-box">
+        <strong>O que é:</strong> É sempre o valor isolado <strong>c</strong>, pois quando x = 0 todos os outros termos zera.
+      </div>
+    </div>
+
+    <!-- Passo 3: Cálculo do Delta -->
+    <div class="node pos-mid-right node-3" id="node-3">
+      <h3>📐 3. Cálculo do Delta (Δ)</h3>
+      <p>Discriminante da função:</p>
+      <div class="math-badge">
+        Δ = b² - 4ac<br>
+        Δ = (-4)² - 4(1)(3)<br>
+        Δ = 16 - 12 = <strong>4</strong>
+      </div>
+      <div class="explanation-box">
+        <strong>O que é:</strong> Como <i>Δ = 4 > 0</i>, a função possui <strong>duas raízes reais e distintas</strong>.
+      </div>
+    </div>
+
+    <!-- Passo 4: Raízes da Função -->
+    <div class="node pos-bottom-right node-4" id="node-4">
+      <h3>🎯 4. Raízes (Fórmula de Bhaskara)</h3>
+      <p>Onde o gráfico cruza o eixo X (y = 0):</p>
+      <div class="math-badge">
+        x = (-(-4) ± √4) / 2(1)<br>
+        x1 = (4 + 2) / 2 = <strong>3</strong><br>
+        x2 = (4 - 2) / 2 = <strong>1</strong>
+      </div>
+      <div class="explanation-box">
+        <strong>O que é:</strong> Os pontos onde a curva toca o chão (eixo X) são <strong>(1, 0)</strong> e <strong>(3, 0)</strong>.
+      </div>
+    </div>
+
+    <!-- Passo 5: Vértice da Parábola -->
+    <div class="node pos-bottom-left node-5" id="node-5">
+      <h3>⛰️ 5. Vértice (Ponto de Mínimo)</h3>
+      <p>O ponto mais baixo da parábola:</p>
+      <div class="math-badge">
+        Xv = -(-4) / 2(1) = <strong>2</strong><br>
+        Yv = -(4) / 4(1) = <strong>-1</strong><br>
+        <strong>Vértice: (2, -1)</strong>
+      </div>
+      <div class="explanation-box">
+        <strong>O que é:</strong> É a "curva da parábola". Como <i>a > 0</i>, este é o menor valor que a função atinge.
+      </div>
+    </div>
+
+    <!-- Passo 6: Gráfico Interativo com Chart.js -->
+    <div class="node pos-mid-left node-6" id="node-6">
+      <h3>📊 6. Gráfico Resultante</h3>
+      <div class="chart-container">
+        <canvas id="parabolaChart"></canvas>
+      </div>
+      <div class="explanation-box" style="margin-top: 6px;">
+        <strong>Visualização:</strong> Note o eixo Y cortando em 3, o Vértice lá embaixo em (2, -1) e as raízes em 1 e 3!
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Pressione [Espaço] ou [Seta para Direita] para avançar no Mapa Mental | f(x) = x² - 4x + 3</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
